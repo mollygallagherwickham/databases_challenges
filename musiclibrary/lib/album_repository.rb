@@ -1,4 +1,4 @@
-require_relative 'album'
+require_relative 'album' 
 
 # Repository class
 class AlbumRepository
@@ -43,5 +43,19 @@ class AlbumRepository
         return album
     end
 
+    def create(album)
+        sql = 'INSERT INTO albums (title, release_year, artist_id) VALUES($1, $2, $3);'
+        sql_params = [album.title, album.release_year, album.artist_id]
 
+        DatabaseConnection.exec_params(sql, sql_params)
+
+    end
+
+    def delete(id)
+        sql = 'DELETE FROM albums WHERE id = $1;'
+        sql_params = [id]
+
+        DatabaseConnection.exec_params(sql, sql_params)
+
+    end
 end

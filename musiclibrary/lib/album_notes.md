@@ -8,11 +8,11 @@ If the table is already created in the database, you can skip this step.
 
 Otherwise, [follow this recipe to design and create the SQL schema for your table](./single_table_design_recipe_template.md).
 
-*In this template, we'll use an example table `books`*
+*In this template, we'll use an example table `students`*
 
 ```
 # EXAMPLE
-Table: books
+Table: students
 Columns:
 id | name | cohort_name
 ```
@@ -30,11 +30,11 @@ If seed data is provided (or you already created it), you can skip this step.
 -- First, you'd need to truncate the table - this is so our table is emptied between each test run,
 -- so we can start with a fresh state.
 -- (RESTART IDENTITY resets the primary key)
-TRUNCATE TABLE books RESTART IDENTITY; -- replace with your own table name.
+TRUNCATE TABLE students RESTART IDENTITY; -- replace with your own table name.
 -- Below this line there should only be `INSERT` statements.
 -- Replace these statements with your own seed data.
-INSERT INTO books (id, title, author) VALUES (1, 'Nineteen Eighty-Four', 'George Orwell');
-INSERT INTO books (id, title, author) VALUES (2, 'Mrs Dalloway', 'Virginia Woolf');
+INSERT INTO students (name, cohort_name) VALUES ('David', 'April 2022');
+INSERT INTO students (name, cohort_name) VALUES ('Anna', 'May 2022');
 ```
 
 Run this SQL file on the database to truncate (empty) the table, and insert the seed data. Be mindful of the fact any existing records in the table will be deleted.
@@ -49,14 +49,14 @@ Usually, the Model class name will be the capitalised table name (single instead
 
 ```ruby
 # EXAMPLE
-# Table name: books
+# Table name: students
 # Model class
 # (in lib/student.rb)
-class Book
+class Student
 end
 # Repository class
 # (in lib/student_repository.rb)
-class BookRepository
+class StudentRepository
 end
 ```
 
@@ -66,12 +66,12 @@ Define the attributes of your Model class. You can usually map the table columns
 
 ```ruby
 # EXAMPLE
-# Table name: books
+# Table name: students
 # Model class
 # (in lib/student.rb)
 class Student
   # Replace the attributes by your own columns.
-  attr_accessor :id, :title, :author
+  attr_accessor :id, :name, :cohort_name
 end
 # The keyword attr_accessor is a special Ruby feature
 # which allows us to set and get attributes on an object,
@@ -92,24 +92,23 @@ Using comments, define the method signatures (arguments and return value) and wh
 
 ```ruby
 # EXAMPLE
-# Table name: books
+# Table name: students
 # Repository class
-# (in lib/book_repository.rb)
-class BookRepository
+# (in lib/student_repository.rb)
+class StudentRepository
   # Selecting all records
   # No arguments
   def all
     # Executes the SQL query:
-    # SELECT id, title, author FROM books;
-    # Returns an array of Book objects.
+    # SELECT id, name, cohort_name FROM students;
+    # Returns an array of Student objects.
   end
   # Gets a single record by its ID
   # One argument: the id (number)
   def find(id)
     # Executes the SQL query:
-    # sql_params = [id]
-    # SELECT id, title, author FROM books WHERE id = $1;
-    # Returns a single Book object.
+    # SELECT id, name, cohort_name FROM students WHERE id = $1;
+    # Returns a single Student object.
   end
   # Add more methods below for each operation you'd like to implement.
   # def create(student)
@@ -130,26 +129,23 @@ These examples will later be encoded as RSpec tests.
 ```ruby
 # EXAMPLES
 # 1
-# Get all books
-repo = BookRepository.new
-books = repo.all
-expect(books.length).to eq 5
-expect(books[0].id).to eq  1
-expect(books[0].title).to eq 'Nineteen Eighty-Four'
-expect(books[0].author).to eq 'George Orwell'
-expect(books[1].id).to eq 2
-expect(books[1].title).to eq 'Mrs Dalloway'
-expect(books[1].author).to eq 'Virginia Woolf'
-
-
-
+# Get all students
+repo = StudentRepository.new
+students = repo.all
+students.length # =>  2
+students[0].id # =>  1
+students[0].name # =>  'David'
+students[0].cohort_name # =>  'April 2022'
+students[1].id # =>  2
+students[1].name # =>  'Anna'
+students[1].cohort_name # =>  'May 2022'
 # 2
-# Get a single book
-repo = BookRepository.new
-book = repo.find(1)
-expect(book.id).to eq 1
-expect(book.title).to eq 'Nineteen Eighty-Four'
-expect(book.author).to eq 'George Orwell'
+# Get a single student
+repo = StudentRepository.new
+student = repo.find(1)
+student.id # =>  1
+student.name # =>  'David'
+student.cohort_name # =>  'April 2022'
 # Add more examples for each method
 ```
 
@@ -164,14 +160,14 @@ This is so you get a fresh table contents every time you run the test suite.
 ```ruby
 # EXAMPLE
 # file: spec/student_repository_spec.rb
-def reset_books_table
-  seed_sql = File.read('spec/seeds_books.sql')
-  connection = PG.connect({ host: '127.0.0.1', dbname: 'books' })
+def reset_students_table
+  seed_sql = File.read('spec/seeds_students.sql')
+  connection = PG.connect({ host: '127.0.0.1', dbname: 'students' })
   connection.exec(seed_sql)
 end
 describe StudentRepository do
   before(:each) do 
-    reset_books_table
+    reset_students_table
   end
   # (your tests will go here).
 end
@@ -180,3 +176,25 @@ end
 ## 8. Test-drive and implement the Repository class behaviour
 
 _After each test you write, follow the test-driving process of red, green, refactor to implement the behaviour._
+
+<!-- BEGIN GENERATED SECTION DO NOT EDIT -->
+
+---
+
+
+
+repository = AlbumRepository.new
+
+new_album = Album.new
+new_album.title = 'Trompe le Monde'
+new_album.release_year = 1991
+new_album.artist_id = 1
+
+repository.create(new_album)
+
+all_albums = repository.all
+
+expect(all_albums).to include (new_album)
+
+# The all_albums array should contain the new Album object
+

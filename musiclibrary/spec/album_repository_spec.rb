@@ -30,4 +30,36 @@ RSpec.describe AlbumRepository do
     expect(album.release_year).to eq '2004'
     expect(album.artist_id).to eq '5'
   end
+
+  it "creates new album" do
+    repository = AlbumRepository.new
+
+    new_album = Album.new
+    new_album.title = 'Trompe le Monde'
+    new_album.release_year = 1991
+    new_album.artist_id = 1
+
+    repository.create(new_album)
+
+    all_albums = repository.all
+
+    expect(all_albums).to include (
+      have_attributes(
+        title: new_album.title, 
+        release_year: '1991'
+      )  
+    )
+  end
+
+  it "deletes album from table" do
+    repo = AlbumRepository.new
+
+    album = repo.delete(5)
+    all_albums = repo.all
+    expect(all_albums).not_to include (
+      have_attributes(
+        id: 5 
+      )  
+    )
+  end
 end
